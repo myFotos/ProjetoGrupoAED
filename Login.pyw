@@ -1,4 +1,5 @@
 from tkinter import *
+
 # Window definition and formatting
 win_login = Tk()
 win_login.title("myFotos")
