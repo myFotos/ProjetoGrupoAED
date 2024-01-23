@@ -1,2 +1,3 @@
 Manu|./Assets/profile_pic.jpg
 a|./Assets/profile_pic.jpg
+Admin|./Assets/profile_pic.jpg

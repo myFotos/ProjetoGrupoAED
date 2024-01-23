@@ -2,8 +2,10 @@ from tkinter import *
 from PIL import Image, ImageTk
 import os
 
-file = open("./app_data/current_user.txt", "r+")
+file = open("./app_data/current_user.txt", "r")
 current_user = file.read()
+file.close()
+file = open("./app_data/current_user.txt", "w")
 file.write("")
 file.close()
 if current_user == "":
@@ -55,7 +57,7 @@ class Photo:
 
         return self.img
 
-def like(img: Photo, likes_label: Label):
+def like(but: int, img: Photo, likes_label: Label):
     # Update the like status and the number of likes
     if not img.liked:
         img.likes = str(int(img.likes) + 1)
@@ -77,7 +79,7 @@ def like(img: Photo, likes_label: Label):
     img.likes_img = ImageTk.PhotoImage(likes_img)
 
     # Update the image displayed in the button
-    dict_likes[f"but_likes{i}"].config(image=img.likes_img)
+    dict_likes[f"but_likes{but}"].config(image=img.likes_img)
     
     with open("./app_data/images_data.txt", "r") as file:
         data = file.readlines()
@@ -181,7 +183,7 @@ def display_images_in_grid():
         dict_likes[f"lab_likes{i}"] = Label(fra_image, text=images[i].likes, font=("Arial", 20))
         dict_likes[f"lab_likes{i}"].grid(row=i * 4 + 2, column=2, pady=5, sticky=W)
         dict_likes[f"but_likes{i}"] = Button(fra_image, image=images[i].likes_img)
-        dict_likes[f"but_likes{i}"].config(command=lambda img=images[i], lab=dict_likes[f"lab_likes{i}"]: like(img, lab))
+        dict_likes[f"but_likes{i}"].config(command=lambda but=i, img=images[i], lab=dict_likes[f"lab_likes{i}"]: like(but, img, lab))
         dict_likes[f"but_likes{i}"].grid(row=i * 4 + 2, column=1, pady=5)
 
         space = Label(fra_image, text = " ", bg="#aaaaaa")

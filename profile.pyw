@@ -2,8 +2,10 @@ from tkinter import *
 from PIL import Image, ImageTk
 import os
 
-file = open("./app_data/current_user.txt", "r+")
+file = open("./app_data/current_user.txt", "r")
 current_user = file.read()
+file.close()
+file = open("./app_data/current_user.txt", "w")
 file.write("")
 file.close()
 if current_user == "":
