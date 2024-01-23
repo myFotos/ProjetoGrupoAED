@@ -1,0 +1,2 @@
+Manu|./Assets/profile_pic.jpg
+a|./Assets/profile_pic.jpg

@@ -1,21 +1,16 @@
 from tkinter import *
-
-# To do
-#  1- create window class
-#  2- discover how to create a new window
-#  3- connect the login window to the new one
+from PIL import Image, ImageTk
+import os
 
 # Window definition and formatting
 win_login = Tk()
 win_login.title("myFotos")
-if win_login.winfo_screenheight() < win_login.winfo_screenwidth(): # Checking for vertical monitors
-    win_login_height = int(win_login.winfo_screenheight() - 120)
-    win_login_width = int(win_login.winfo_screenwidth() / 2.5)
-else:
-    win_login_width = int(win_login.winfo_screenheight() - 120)
-    win_login_height = int(win_login.winfo_screenwidth() / 2.5)
+win_login_height = int(win_login.winfo_screenheight() - 120)
+win_login_width = int(win_login.winfo_screenwidth() / 2.5)
+win_login.iconphoto(True, PhotoImage(file="./Assets/TAKOC.png"))
 win_login.geometry(f"{win_login_width}x{win_login_height}+{int((win_login.winfo_screenwidth() - win_login_width) / 2)}+{int((win_login.winfo_screenheight() - win_login_height) / 4)}")
 win_login.resizable(0, 0)
+
 
 # Function definitions
 def log_in(username: str, password: str):
@@ -35,7 +30,12 @@ def log_in(username: str, password: str):
     
     if valid_user:
         if valid_pass:
-            print("Should log in")
+            file.close()
+            file = open("./app_data/current_user.txt", "w")
+            file.write(username)
+            file.close()
+            os.startfile("main.pyw")
+            win_login.destroy()
         else:
             lab_password_error.config(text="Password incorreta!")
     else:
@@ -85,7 +85,8 @@ def sign_in(username: str, password: str):
     valid_pass = True
     for user in range(len(users_credentials)):
         users_credentials[user] = users_credentials[user].split(";")
-        if username in users_credentials[user] or username == "" or username.count(" ") + username.count("_") == len(username):
+        if username in users_credentials[user] or username == "" \
+            or username.count(" ") + username.count("_") == len(username) or "|" in username:
             valid_user = False
             break
     if len(password) < 8 or password == "" or " " in password:
@@ -94,21 +95,28 @@ def sign_in(username: str, password: str):
     if valid_user:
         if valid_pass:
             file.write(f"\n{username};{password}")
+            file.close()
+            file = open("./app_data/users_interactions.txt", "a")
+            file.write(f"\n{username}|./Assets/profile_pic.jpg")
+            file.close()
             switch_sign_log()
         elif " " in password:
             lab_password_error.config(text="Password inválida (contem ' ')")
         else:
             lab_password_error.config(text="Password curta (<8 carateres)")
+    elif "|" in username:
+        lab_username_error.config(text="Username contem '|'")
     else:
         lab_username_error.config(text="Username indisponível")
-    file.close()
 
 
 # Canvas definition and formatting for background image
 canvas = Canvas(win_login, width=win_login_width, height=win_login_height)
-background_image = PhotoImage(file="./Assets/login background.png")
+background_image = Image.open("./Assets/login background.png")
+background_image = background_image.resize((win_login_width, win_login_height))
+background_image = ImageTk.PhotoImage(background_image)
 canvas.place(x=-2, y=-2)
-canvas.create_image(win_login_width / 2, win_login_height / 2, image=background_image)
+canvas.create_image(win_login_width / 2 + 2, win_login_height / 2 + 2, image=background_image)
 
 # Frame definition and formatting for login widgets
 if win_login.winfo_screenheight() < win_login.winfo_screenwidth():

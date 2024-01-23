@@ -1,0 +1,5 @@
+paisagem
+animal
+retrato
+desporto
+cartoon
