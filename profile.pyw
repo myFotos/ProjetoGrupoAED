@@ -1,4 +1,5 @@
 from tkinter import *
+from tkinter import filedialog
 from PIL import Image, ImageTk
 import os
 
@@ -54,7 +55,6 @@ class Photo:
             likes_img = Image.open("./Assets/no heart.png")
             likes_img = likes_img.resize((40, 40))
             self.likes_img = ImageTk.PhotoImage(likes_img)
-
         return self.img
 
 def like(img: Photo, likes_label: Label):
@@ -92,6 +92,38 @@ def go_home():
     os.startfile("main.pyw")
     win_mainpage.destroy()
 
+def search(tags: str = "#"):
+    global images, fra_image, can_scroll, v_scrollbar, fra_canvas_scroll
+
+    go_home()
+    can_scroll.destroy()
+    v_scrollbar.destroy()
+    fra_image.destroy()
+    can_scroll = Canvas(fra_canvas_scroll)
+    v_scrollbar = Scrollbar(fra_canvas_scroll, orient="vertical", command=can_scroll.yview)
+    v_scrollbar.pack(side="right", fill="y")
+    can_scroll.configure(yscrollcommand=v_scrollbar.set)
+    can_scroll.pack(side="left", fill=BOTH, expand=True)
+    fra_image = Frame(can_scroll, padx=50, bg="#aaaaaa")
+    can_scroll.create_window((0, 0), window=fra_image, anchor=NW)
+
+    win_mainpage.focus()
+    file = open("./app_data/images_data.txt", "r")
+    images_data = file.read().split("\n")
+    file.close()
+
+    images = []
+    if tags.split("#") == [tags]:
+        for image_info in images_data:
+            if tags in image_info.split("|")[1]:
+                images.append(Photo(image_info))
+    else:
+        for x in tags.split("#")[1:]:
+            for image_info in images_data:
+                if f"#{x}" in image_info.split("|")[3]:
+                    images.append(Photo(image_info))
+
+    display_images_in_grid()
 
 fra_canvas_scroll = Frame(win_mainpage, relief=RIDGE, borderwidth=2, 
                           width=win_mainpage_width, height=win_mainpage_height - 70)
@@ -133,11 +165,24 @@ def find_profile_pic(user, scale: tuple = (40, 40)):
     return profile_pic
 
 
+def upload():
+    # Open a file dialog to choose an image file
+    file_path = filedialog.askopenfilename(title="Select Image", filetypes=[("Image files", "*.png;*.jpg;*.jpeg")])
+
+
 def display_images_in_grid():
     global dict_likes
 
     lab_profile_pic = Label(fra_image, image=find_profile_pic(current_user, (200, 200)))
     lab_profile_pic.grid(row=0, column=1, columnspan=2, pady=40, sticky=W)
+
+    but_upload = Button(fra_image, text="Fazer upload", command=lambda: upload())
+    but_upload.grid(row=0, column=10, columnspan=3, sticky=W)
+
+    if len(images) == 0:
+        label = Label(fra_image, text="Ainda não fez upload de nenhuma imagem", width=110, height=18, relief=RIDGE, justify="center")
+        label.pack_propagate(False)
+        label.grid(row=2, column=1, padx=5, pady=5, columnspan=20)
 
     # Display images in a grid inside the image frame
     for i in range(len(images)):
